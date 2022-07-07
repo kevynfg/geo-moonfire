@@ -8,8 +8,9 @@ interface MapProps {
         lat: number;
         lng: number;
     }
-    setCoodinates: (coordinates: { lat: number; lng: number }) => void; 
+    setCoordinates: (coordinates: { lat: number; lng: number }) => void; 
     markers: MarkerOps[]
+    findPlaceByMapClick: (lat: number, lng: number) => void;
 }
 
 export default function Map(props: MapProps) {
@@ -17,10 +18,15 @@ export default function Map(props: MapProps) {
     const [map, setMap] = useState(null);
     const [userMarker, setUserMarker] = useState<google.maps.Marker>();
     const googlemap = useRef(null);
+    let google: any;
+    
+    if (typeof window !== "undefined" && typeof window.google !== "undefined") {
+        google = window.google;
+    }
 
     useEffect(() => {
         navigator.geolocation.getCurrentPosition(({coords: {latitude, longitude}}) => {
-            props.setCoodinates({
+            props.setCoordinates({
                 lat: latitude,
                 lng: longitude,
             })
@@ -28,7 +34,7 @@ export default function Map(props: MapProps) {
     }, [])
 
     useEffect(() => {
-        if (!userMarker) {
+        if (!userMarker && typeof google !== "undefined") {
             setUserMarker(new google.maps.Marker());
         }
 
@@ -37,8 +43,16 @@ export default function Map(props: MapProps) {
                 userMarker.setMap(null);
             }
         }
-    }, [userMarker])
-    
+    }, [userMarker, google])
+
+    useEffect(() => {
+        if (userMarker) {
+            userMarker.setPosition(new google.maps.LatLng(props.coordinates.lat, props.coordinates.lng));
+            userMarker.setMap(map);
+        }
+    }, [props.coordinates])
+
+    console.log('props.coordinates', props.coordinates)
     return (
         <div className="flex flex-1">
             <section className="h-[90vh] w-[100%]">
@@ -77,6 +91,8 @@ export default function Map(props: MapProps) {
                                 map: map,
                                 title: 'Localização',
                             }))
+
+                            props.findPlaceByMapClick(event.lat, event.lng)
                         }
                     }}
                     >
