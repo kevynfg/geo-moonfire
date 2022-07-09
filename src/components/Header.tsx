@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { MagnifyingGlass, X } from "phosphor-react";
+import { GoogleLogo, MagnifyingGlass, X } from "phosphor-react";
 import { LatLng } from "@/utils/types/latlng.type";
 import { useGoogle} from "@/hooks/useGoogle"
+import { useSession, signOut } from 'next-auth/react'
+import { useRouter } from 'next/router'
+import { formatName } from '@/utils/format-name'
 
 interface HeaderProps {
  setLocations: (locations: google.maps.GeocoderResult[]) => void;
@@ -18,6 +21,8 @@ export default function Header(props: HeaderProps) {
         lng: 0,
     });
     const [searchBox, setSearchBox] = useState<google.maps.places.SearchBox>();
+    const router = useRouter();
+    const {data, status} = useSession();
     let googleInstance = useGoogle();
     
     if (typeof window !== "undefined" && typeof window.google !== "undefined") {
@@ -27,7 +32,9 @@ export default function Header(props: HeaderProps) {
     useEffect(() => {
         if (typeof window !== "undefined" && typeof window.google !== "undefined") {
             const input = document.getElementById("search-input") as HTMLInputElement;
-            setSearchBox(new google.maps.places.SearchBox(input));
+            setSearchBox(new google.maps.places.SearchBox(input, {
+                bounds: new google.maps.LatLngBounds()
+            }));
         }
 
         return () => {
@@ -93,7 +100,16 @@ export default function Header(props: HeaderProps) {
             })
         }
     }
-    
+
+    async function handleLogin() {
+        if (data?.user) {
+            signOut();
+        } else {
+            console.log('asPath', router.asPath)
+            router.push(`/auth/signin?callbackUrl=${router.asPath}`)
+        }
+    }
+    console.log('sesseion', data)
     return (
         <header className="flex justify-between items-center py-4 bg-green-400 border-b border-gray-600 mb-4 sm:gap-12">
             <h1 className="text-2xl font-bold">
@@ -106,6 +122,15 @@ export default function Header(props: HeaderProps) {
                     </a>
                 </Link>
             </h1>
+            <div className="flex items-center relative px-4 gap-2">
+                <GoogleLogo weight="bold" className="" size={32}/>
+                {data?.user ? (
+                    <p className="ml-4 leading-relaxed font-bold">{`Bem-vindo, ${formatName(data.user.name as string)}`}</p>
+                    
+                ): null}
+                {data?.user ? "|" : null}
+                <button type="button" className="leading-relaxed font-bold px-2 hover:text-blue-600" onClick={handleLogin}>{data?.user ? "Logout" : "Login"}</button>
+            </div>
             <div className="flex gap-4 mr-4 bg-white rounded w-[30rem] p-2">
                 <input 
                     ref={googlemapsRef}

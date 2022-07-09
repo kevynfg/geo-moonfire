@@ -2,9 +2,14 @@ import '../../styles/globals.css';
 import type { AppProps } from 'next/app'
 import { withTRPC } from "@trpc/next";
 import type { AppRouter } from "@/backend/router";
+import { SessionProvider } from "next-auth/react"
 
 function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
+  return (
+    <SessionProvider session={pageProps.session}>
+      <Component {...pageProps} />
+    </SessionProvider>
+  )
 }
 
 function getBaseUrl() {
