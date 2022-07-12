@@ -24,6 +24,10 @@ export default function Header(props: HeaderProps) {
     const router = useRouter();
     const {data, status} = useSession();
     let googleInstance = useGoogle();
+
+    if (!data?.user) {
+        router.push('/login');
+    }
     
     if (typeof window !== "undefined" && typeof window.google !== "undefined") {
         googleInstance = window.google;
