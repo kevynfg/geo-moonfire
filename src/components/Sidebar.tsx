@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
+import React from "react";
+import { MapPin } from "phosphor-react";
 
 interface SidebarProps {
     locations: google.maps.GeocoderResult[];
     setNewCoordinates: (coordinates: google.maps.LatLngLiteral) => void;
 }
-
-type NotAllowedTypes = "political" | "country" | "plus_code"
 
 export default function Sidebar(props: SidebarProps) {
     const notAllowedTypes = ["political" , "country" , "plus_code"];
@@ -27,8 +26,9 @@ export default function Sidebar(props: SidebarProps) {
             {props.locations && props.locations.map((location: google.maps.GeocoderResult) => {
                 if (isLocationTypeAllowed(location.types)) {
                     return (
-                        <div className="px-4" key={location.place_id}>
-                            <p className="font-bold text-sm leading-relaxed mt-2 p-2 mb-2 cursor-pointer block hover:text-blue-600" onClick={() => {
+                        <div className="flex items-center px-4" key={location.place_id}>
+                            <MapPin className="flex-[10%]" size={30} weight="fill" />
+                            <p className="flex-[90%] font-bold text-sm leading-relaxed mt-2 p-2 mb-2 cursor-pointer block hover:text-blue-600" onClick={() => {
                                 props.setNewCoordinates({
                                     lat: location.geometry.location.lat(),
                                     lng: location.geometry.location.lng()

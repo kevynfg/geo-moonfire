@@ -14,7 +14,7 @@ interface MarkerProps {
 export default function Marker(props: MarkerProps) {
     console.log('props marker', props)
         return (
-        <div className="hover:cursor-pointer" onClick={() => props.setIsOpen(!props.popover)}>
+        <div className="hover:cursor-pointer">
             <Alien weight="fill" size={30}></Alien> 
             {props.popover && (
                 <div className="absolute bg-white rounded-lg shadow-lg p-4">

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
 import Link from "next/link";
 import { GoogleLogo, MagnifyingGlass, X } from "phosphor-react";
 import { LatLng } from "@/utils/types/latlng.type";
@@ -24,16 +24,12 @@ export default function Header(props: HeaderProps) {
     const router = useRouter();
     const {data, status} = useSession();
     let googleInstance = useGoogle();
-
-    if (!data?.user) {
-        router.push('/login');
-    }
     
     if (typeof window !== "undefined" && typeof window.google !== "undefined") {
         googleInstance = window.google;
     }
 
-    useEffect(() => {
+    useEffect(() => {   
         if (typeof window !== "undefined" && typeof window.google !== "undefined") {
             const input = document.getElementById("search-input") as HTMLInputElement;
             setSearchBox(new google.maps.places.SearchBox(input, {
@@ -127,7 +123,7 @@ export default function Header(props: HeaderProps) {
                 </Link>
             </h1>
             <div className="flex items-center relative px-4 gap-2">
-                <GoogleLogo weight="bold" className="" size={32}/>
+                {/* <GoogleLogo weight="bold" className="" size={32}/> */}
                 {data?.user ? (
                     <p className="ml-4 leading-relaxed font-bold">{`Bem-vindo, ${formatName(data.user.name as string)}`}</p>
                     
@@ -135,7 +131,7 @@ export default function Header(props: HeaderProps) {
                 {data?.user ? "|" : null}
                 <button type="button" className="leading-relaxed font-bold px-2 hover:text-blue-600" onClick={handleLogin}>{data?.user ? "Logout" : "Login"}</button>
             </div>
-            <div className="flex gap-4 mr-4 bg-white rounded w-[30rem] p-2">
+            <div className="flex gap-4 mr-4 bg-white rounded w-[33rem] p-2">
                 <input 
                     ref={googlemapsRef}
                     type="text"

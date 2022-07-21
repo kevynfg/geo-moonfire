@@ -64,12 +64,9 @@ export default function Map(props: MapProps) {
                     zoom={15}
                     defaultZoom={10}
                     margin={[50, 50, 50, 50]}
-                    // onChange={(({ center }) => {
-                    //     console.log('center', center)
-                    //     props.setCoodinates({
-                    //         lat: -23.9692876,
-                    //         lng: -46.3892766,
-                    //     })
+                    // onChange={(({ bounds }) => {
+                    //     console.log('center', bounds)
+                        
                     // })}
                     onChildClick={(key, childProps) => {
                         console.log('key and childProps', key, childProps)
