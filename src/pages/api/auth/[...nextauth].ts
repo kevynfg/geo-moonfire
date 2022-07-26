@@ -26,6 +26,14 @@ export default NextAuth({
       from: process.env.NEXT_PUBLIC_EMAIL_FROM
     })
   ],
+  callbacks: {
+    session({ session, user }) {
+      if (session.user) {
+        session.user.id = user.id;
+      }
+      return session;
+    }
+  },
   pages: {
     signIn: "/api/auth/signin",
   },
