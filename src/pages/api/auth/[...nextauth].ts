@@ -3,7 +3,6 @@ import GoogleProvider from "next-auth/providers/google"
 import EmailProvider from 'next-auth/providers/email'
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { PrismaClient } from "@prisma/client";
-import { createTransport } from 'nodemailer';
 
 const prisma = new PrismaClient()
 
@@ -17,7 +16,7 @@ export default NextAuth({
     EmailProvider({
       server: {
         host: process.env.NEXT_PUBLIC_EMAIL_SERVER_HOST,
-        port: +process.env.NEXT_PUBLIC_EMAIL_SERVER_PORT!,
+        port: Number(process.env.NEXT_PUBLIC_EMAIL_SERVER_PORT!),
         auth: {
           user: process.env.NEXT_PUBLIC_EMAIL_SERVER_USER,
           pass: process.env.NEXT_PUBLIC_EMAIL_SERVER_PASSWORD
@@ -28,7 +27,7 @@ export default NextAuth({
   ],
   callbacks: {
     session({ session, user }) {
-      if (session.user) {
+      if (session.user?.id) {
         session.user.id = user.id;
       }
       return session;

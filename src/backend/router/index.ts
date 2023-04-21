@@ -14,7 +14,6 @@ export const appRouter = trpc
     }).nullish(),
     async resolve({input}) {
       
-      console.log('entrei', input);
   
     },
   })

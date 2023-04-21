@@ -54,8 +54,6 @@ const Home: NextPage = () => {
         })
   }
   
-  // console.log('new place', newPlaceOnMap)
-  // console.log('coordinates changed', coordinates)
   return (
     <Suspense fallback={<Loading />}>
       <div className="flex flex-col min-h-screen">

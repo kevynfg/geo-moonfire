@@ -33,7 +33,6 @@ export default function Sidebar(props: SidebarProps) {
                                     lat: location.geometry.location.lat(),
                                     lng: location.geometry.location.lng()
                                 })
-                                console.log('location', location.geometry.location.lat(), location.geometry.location.lng())
                             }}>{location.formatted_address}</p>
                         </div>
                     )

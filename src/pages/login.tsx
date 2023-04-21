@@ -20,7 +20,6 @@ export default function Login() {
 
   function handleLoginWithoutProvider(event: FormEvent) {
     event.preventDefault();
-    console.log("email", email);
     
     if (!email) return false;
     

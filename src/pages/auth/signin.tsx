@@ -5,7 +5,6 @@ import { useRouter } from 'next/router'
 export default function Signin() {
     const {data, status} = useSession()
     const router = useRouter();
-    console.log('session signin', data);
 
     if (status === 'loading') {
         return <div>Checking authentication...</div>

@@ -25,15 +25,6 @@ export default function Map(props: MapProps) {
     }
 
     useEffect(() => {
-        navigator.geolocation.getCurrentPosition(({coords: {latitude, longitude}}) => {
-            props.setCoordinates({
-                lat: latitude,
-                lng: longitude,
-            })
-        });
-    }, [])
-
-    useEffect(() => {
         if (!userMarker && typeof google !== "undefined") {
             setUserMarker(new google.maps.Marker());
         }
@@ -46,13 +37,14 @@ export default function Map(props: MapProps) {
     }, [userMarker, google])
 
     useEffect(() => {
-        if (userMarker) {
-            userMarker.setPosition(new google.maps.LatLng(props.coordinates.lat, props.coordinates.lng));
-            userMarker.setMap(map);
+        if (props.coordinates?.lat && props.coordinates?.lng) {  
+            if (userMarker) {
+                userMarker.setPosition(new google.maps.LatLng(props.coordinates.lat, props.coordinates.lng));
+                userMarker.setMap(map);
+            }
         }
-    }, [props.coordinates])
+    })
 
-    console.log('props.coordinates', props.coordinates)
     return (
         <div className="flex flex-1">
             <section className="h-[90vh] w-[100%]">
@@ -64,20 +56,12 @@ export default function Map(props: MapProps) {
                     zoom={15}
                     defaultZoom={10}
                     margin={[50, 50, 50, 50]}
-                    // onChange={(({ bounds }) => {
-                    //     console.log('center', bounds)
-                        
-                    // })}
                     onChildClick={(key, childProps) => {
-                        console.log('key and childProps', key, childProps)
                     }}
                     onGoogleApiLoaded={({ map, maps, ref }) => {
                         setMap(map);
                     }}
-                    onClick={(event: GoogleMapReact.ClickEventValue) => {
-                        console.log('event', event)
-                        console.log('ref', googlemap.current)
-                        
+                    onClick={(event: GoogleMapReact.ClickEventValue) => {                        
                         if (userMarker) {
                             userMarker.setMap(null)
                             setUserMarker(new window.google.maps.Marker({
@@ -111,4 +95,22 @@ export default function Map(props: MapProps) {
                 </section>
         </div>
     )
+}
+
+export async function getServerSideProps() {
+    let lat, lng;
+
+    navigator.geolocation.getCurrentPosition(({coords: {latitude, longitude}}) => {
+        lat = latitude;
+        lng = longitude;
+    });
+    
+      return {
+        props: {
+          coordinates: {
+            lat,
+            lng
+          }
+        }
+      };
 }

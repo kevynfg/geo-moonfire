@@ -12,7 +12,6 @@ interface MarkerProps {
 }
 
 export default function Marker(props: MarkerProps) {
-    console.log('props marker', props)
         return (
         <div className="hover:cursor-pointer">
             <Alien weight="fill" size={30}></Alien> 

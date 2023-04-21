@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState, Suspense } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { GoogleLogo, MagnifyingGlass, X } from "phosphor-react";
+import { MagnifyingGlass, X } from "phosphor-react";
 import { LatLng } from "@/utils/types/latlng.type";
 import { useGoogle} from "@/hooks/useGoogle"
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { formatName } from '@/utils/format-name'
+import Image from "next/image";
 
 interface HeaderProps {
  setLocations: (locations: google.maps.GeocoderResult[]) => void;
@@ -45,26 +46,34 @@ export default function Header(props: HeaderProps) {
     }, [googleInstance])
 
     useEffect(() => {
+        let placesChangedListener: google.maps.MapsEventListener;
         if (searchBox && googleInstance) {
-            searchBox.addListener("places_changed", () => {
+            placesChangedListener = searchBox.addListener("places_changed", () => {
                 const places = searchBox.getPlaces()
                 if (!places || places.length === 0) {
                     return;
                 }
 
-                if (places && places[0].geometry?.location) {
+                let location = places[0].geometry?.location;
+                if (places && location) {
                     setSearchLocation({
-                        lat: places[0].geometry.location.lat(),
-                        lng: places[0].geometry.location.lng(),
+                        lat: location.lat(),
+                        lng: location.lng(),
                     })
 
                     props.setNewMarkerBySearchBox({
-                        lat: places[0].geometry.location.lat(),
-                        lng: places[0].geometry.location.lng(),
+                        lat: location.lat(),
+                        lng: location.lng(),
                     })
                 }
             })
         }
+
+        return () => {
+            if (placesChangedListener) {
+              googleInstance.maps.event.removeListener(placesChangedListener);
+            }
+          };
     }, [searchBox, googleInstance])
 
     useEffect(() => {
@@ -105,11 +114,10 @@ export default function Header(props: HeaderProps) {
         if (data?.user) {
             signOut();
         } else {
-            console.log('asPath', router.asPath)
             router.push(`/auth/signin?callbackUrl=${router.asPath}`)
         }
     }
-    console.log('sesseion', data)
+
     return (
         <header className="flex justify-between items-center py-4 bg-green-400 border-b border-gray-600 mb-4 sm:gap-12">
             <h1 className="text-2xl font-bold">
@@ -123,10 +131,17 @@ export default function Header(props: HeaderProps) {
                 </Link>
             </h1>
             <div className="flex items-center relative px-4 gap-2">
-                {/* <GoogleLogo weight="bold" className="" size={32}/> */}
                 {data?.user ? (
-                    <p className="ml-4 leading-relaxed font-bold">{`Bem-vindo, ${formatName(data.user.name as string)}`}</p>
-                    
+                    <>
+                        {data.user.image && ( 
+                            <Image 
+                                src={data.user.image!} 
+                                alt="Logged user avatar" 
+                                height={30} width={30} 
+                                layout="fixed" className="rounded-2xl" /> 
+                        )}
+                        <p className="ml-4 leading-relaxed font-bold">{`Bem-vindo, ${formatName(data.user.name as string)}`}</p>
+                    </>
                 ): null}
                 {data?.user ? "|" : null}
                 <button type="button" className="leading-relaxed font-bold px-2 hover:text-blue-600" onClick={handleLogin}>{data?.user ? "Logout" : "Login"}</button>

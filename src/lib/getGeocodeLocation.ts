@@ -6,12 +6,10 @@ export async function getGeocodeLocation(input: {address?: string, location?: {l
             country: "BR",
         }, address: input.address}, (results: google.maps.GeocoderResult[] | null, status: google.maps.GeocoderStatus) => {
             if (status !== "OK") {
-                console.log('zero results');
                 return;
             }
             
             if (status === "OK") {
-                console.log('result', results);
                 result.push(...results as google.maps.GeocoderResult[]);
             }
         })
