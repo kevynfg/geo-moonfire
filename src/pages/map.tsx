@@ -23,8 +23,8 @@ const Home: NextPage = () => {
   const router = useRouter();
   const { data, status } = useSession();
   const [coordinates, setCoordinates] = useState({
-    lat: -23.9692876,
-    lng: -46.3892766,
+    lat: 0,
+    lng: 0,
   })
   const [markers, setMarkers] = useState<MarkerOps[]>([])
   const [searchedLocations, setSearchedLocations] = useState<google.maps.GeocoderResult[]>([]);

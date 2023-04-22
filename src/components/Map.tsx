@@ -25,6 +25,15 @@ export default function Map(props: MapProps) {
     }
 
     useEffect(() => {
+        navigator.geolocation.getCurrentPosition(({coords: {latitude, longitude}}) => {
+            props.setCoordinates({
+                lat: latitude,
+                lng: longitude,
+            })
+        });
+    }, [])
+
+    useEffect(() => {
         if (!userMarker && typeof google !== "undefined") {
             setUserMarker(new google.maps.Marker());
         }
@@ -37,13 +46,11 @@ export default function Map(props: MapProps) {
     }, [userMarker, google])
 
     useEffect(() => {
-        if (props.coordinates?.lat && props.coordinates?.lng) {  
-            if (userMarker) {
-                userMarker.setPosition(new google.maps.LatLng(props.coordinates.lat, props.coordinates.lng));
-                userMarker.setMap(map);
-            }
+        if (userMarker) {
+            userMarker.setPosition(new google.maps.LatLng(props.coordinates.lat, props.coordinates.lng));
+            userMarker.setMap(map);
         }
-    })
+    }, [props.coordinates])
 
     return (
         <div className="flex flex-1">
@@ -71,46 +78,29 @@ export default function Map(props: MapProps) {
                                 }, 
                                 map: map,
                                 title: 'Localização',
-                            }))
-
-                            props.findPlaceByMapClick(event.lat, event.lng)
+                            }))                        
+                            props.findPlaceByMapClick(event.lat, event.lng)                            
+                            console.log('props.coordinates', props.coordinates);
+                                                        
                         }
                     }}
                     >
-                        {props.markers.length > 0 && props.markers.map((marker) => {
-                            if (marker.position) {
-                                return (
-                                    <Marker 
+                    {props.markers.length > 0 && props.markers.map((marker) => {
+                        if (marker.position) {
+                            return (
+                                <Marker 
                                     key={`${marker.position?.lat}/${marker.position?.lng}`} 
                                     lat={marker.position.lat} 
                                     lng={marker.position.lng} 
                                     description={marker.title} 
                                     popover={isOpen} 
                                     setIsOpen={setIsOpen}
-                                    />
-                                )
-                            }
-                        })}
+                                />
+                            )
+                        }
+                    })}
                     </GoogleMapReact>
                 </section>
         </div>
     )
-}
-
-export async function getServerSideProps() {
-    let lat, lng;
-
-    navigator.geolocation.getCurrentPosition(({coords: {latitude, longitude}}) => {
-        lat = latitude;
-        lng = longitude;
-    });
-    
-      return {
-        props: {
-          coordinates: {
-            lat,
-            lng
-          }
-        }
-      };
 }
